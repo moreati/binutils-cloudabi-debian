@@ -1,0 +1,10 @@
+# We choose to use usr/<gnu triplet> rather than usr/<multiarch tuple>.
+@PKG@ binary: non-standard-dir-in-usr
+@PKG@ binary: file-in-unusual-dir
+
+# Some manpages contain tables that can't be line wrapped
+@PKG@ binary: manpage-has-errors-from-man
+
+# This package isn't intended to go in Debian - it violates Debian policy
+# intentionally, hence there is no ITP to close.
+@PKG@ binary: new-package-should-close-itp-bug

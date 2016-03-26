@@ -1,0 +1,84 @@
+#!/usr/bin/make -f
+# Output every command that modifies files on the build system.
+export DH_VERBOSE = 1
+
+# From http://nuxi.nl instructions
+CONFARGS = \
+	--disable-gdb \
+	--disable-nls \
+	--prefix=/usr
+
+# From Debian's own binutils
+CONFARGS += \
+	--with-sysroot=/ \
+	--enable-shared \
+	--with-system-zlib \
+	--disable-compressed-debug-sections \
+	--enable-deterministic-archives \
+	--enable-plugins \
+	--enable-threads
+
+%:
+	dh $@
+
+override_dh_auto_configure: override_dh_auto_configure_aarch64 override_dh_auto_configure_x86_64
+
+override_dh_auto_configure_aarch64:
+	mkdir build-binutils-aarch64-unknown-cloudabi
+	cd build-binutils-aarch64-unknown-cloudabi \
+		&& ../configure $(CONFARGS) \
+						--target=aarch64-unknown-cloudabi
+
+override_dh_auto_configure_x86_64:
+	mkdir build-binutils-x86_64-unknown-cloudabi
+	cd build-binutils-x86_64-unknown-cloudabi \
+		&& ../configure $(CONFARGS) \
+						--target=x86_64-unknown-cloudabi
+
+override_dh_auto_build: override_dh_auto_build_aarch64 override_dh_auto_build_x86_64
+
+override_dh_auto_build_aarch64:
+	dh_auto_build --builddirectory=build-binutils-aarch64-unknown-cloudabi
+
+override_dh_auto_build_x86_64:
+	dh_auto_build --builddirectory=build-binutils-x86_64-unknown-cloudabi
+
+
+override_dh_auto_install: override_dh_auto_install_aarch64 override_dh_auto_install_x86_64
+
+override_dh_auto_install_aarch64:
+	dh_auto_install --builddirectory=build-binutils-aarch64-unknown-cloudabi \
+					--destdir=debian/binutils-aarch64-unknown-cloudabi
+	install -d -m 755 debian/binutils-aarch64-unknown-cloudabi/usr/share/lintian/overrides
+	sed -e 's/@PKG@/binutils-aarch64-unknown-cloudabi/' \
+		< debian/binutils-cloudabi.overrides.in \
+		> debian/binutils-aarch64-unknown-cloudabi/usr/share/lintian/overrides/binutils-aarch64-unknown-cloudabi
+	cd debian/binutils-aarch64-unknown-cloudabi/usr/aarch64-unknown-cloudabi/bin \
+		&& for f in *; do \
+			rm ../../bin/aarch64-unknown-cloudabi-$$f; \
+			ln -s $$f ../../bin/aarch64-unknown-cloudabi-$$f; \
+		done
+
+override_dh_auto_install_x86_64:
+	dh_auto_install --builddirectory=build-binutils-x86_64-unknown-cloudabi \
+					--destdir=debian/binutils-x86-64-unknown-cloudabi
+	install -d -m 755 debian/binutils-x86-64-unknown-cloudabi/usr/share/lintian/overrides
+	sed -e 's/@PKG@/binutils-x86-64-unknown-cloudabi/' \
+		< debian/binutils-cloudabi.overrides.in \
+		> debian/binutils-x86-64-unknown-cloudabi/usr/share/lintian/overrides/binutils-x86-64-unknown-cloudabi
+	cd debian/binutils-x86-64-unknown-cloudabi/usr/x86_64-unknown-cloudabi/bin \
+		&& for f in *; do \
+			rm ../../bin/x86_64-unknown-cloudabi-$$f; \
+			ln -s $$f ../../bin/x86_64-unknown-cloudabi-$$f; \
+		done
+
+override_dh_shlibdeps:
+	dh_shlibdeps -l usr/x86_64-pc-linux-gnu/aarch64-unknown-cloudabi/lib
+	dh_shlibdeps -l usr/x86_64-pc-linux-gnu/x86_64-unknown-cloudabi/lib
+	rm -f usr/x86_64-pc-linux-gnu/aarch64-unknown-cloudabi/lib/*.la
+	rm -f usr/x86_64-pc-linux-gnu/x86_64-unknown-cloudabi/lib/*.la
+
+override_dh_auto_clean:
+	dh_auto_clean
+	dh_auto_clean --builddirectory=build-binutils-aarch64-unknown-cloudabi
+	dh_auto_clean --builddirectory=build-binutils-x86_64-unknown-cloudabi

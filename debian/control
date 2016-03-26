@@ -1,0 +1,33 @@
+Source: binutils-cloudabi
+Section: devel
+Priority: optional
+Maintainer: Alex Willmer <alex@moreati.org.uk>
+Build-Depends: debhelper (>=9),autotools-dev
+Standards-Version: 3.9.7
+Homepage: https://www.gnu.org/software/binutils/
+#Vcs-Git: git://anonscm.debian.org/collab-maint/binutils-cloudabi.git
+#Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/binutils-cloudabi.git
+
+Package: binutils-x86-64-unknown-cloudabi
+Architecture: any
+Priority: extra
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: GNU binary utilities, for x86_64-unknown-cloudabi target
+ This package provides GNU assembler, linker and binary utilities
+ for x86_64-unknown-cloudabi target, for use in a cross-compilation
+ environment.
+ .
+ You don't need this package unless you plan to cross-compile programs
+ for x86_64-unknown-cloudabi.
+
+Package: binutils-aarch64-unknown-cloudabi
+Architecture: any
+Priority: extra
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: GNU binary utilities, for aarch64-unknown-cloudabi target
+ This package provides GNU assembler, linker and binary utilities
+ for aarch64-unknown-cloudabi target, for use in a cross-compilation
+ environment.
+ .
+ You don't need this package unless you plan to cross-compile programs
+ for aarch64-unknown-cloudabi.
